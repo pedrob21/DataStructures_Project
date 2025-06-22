@@ -30,7 +30,8 @@ void salvarIndices() {
 }
 
 void salvarRegistro(Manga *m) {
-    FILE *fp = fopen("registro.txt", "a+b");
+    FILE *fp = fopen("registro.txt", "ab"); 
+    fseek(fp, 0, SEEK_END);
     long pos = ftell(fp);
     fwrite(m, sizeof(Manga), 1, fp);
     fclose(fp);
@@ -45,87 +46,60 @@ void salvarRegistro(Manga *m) {
     salvarIndices();
 }
 
-void criarRegistro() {
-    Manga m;
-    char buffer[100];
-
-    printf("ISBN: ");
-    fgets(m.isbn, sizeof(m.isbn), stdin);
-    m.isbn[strcspn(m.isbn, "\n")] = 0;
-
-    printf("Titulo: ");
-    fgets(m.titulo, sizeof(m.titulo), stdin);
-    m.titulo[strcspn(m.titulo, "\n")] = 0;
-
-    printf("Autores: ");
-    fgets(m.autores, sizeof(m.autores), stdin);
-    m.autores[strcspn(m.autores, "\n")] = 0;
-
-    printf("Ano de inicio: ");
-    fgets(buffer, sizeof(buffer), stdin);
-    sscanf(buffer, "%d", &m.anoInicio);
-
-    printf("Ano de fim (- se em andamento): ");
-    fgets(buffer, sizeof(buffer), stdin);
-    buffer[strcspn(buffer, "\n")] = 0;
-    if (strcmp(buffer, "-") == 0)
-        m.anoFim = -1;
-    else
-        sscanf(buffer, "%d", &m.anoFim);
-
-    printf("Genero: ");
-    fgets(m.genero, sizeof(m.genero), stdin);
-    m.genero[strcspn(m.genero, "\n")] = 0;
-
-    printf("Revista: ");
-    fgets(m.revista, sizeof(m.revista), stdin);
-    m.revista[strcspn(m.revista, "\n")] = 0;
-
-    printf("Editora: ");
-    fgets(m.editora, sizeof(m.editora), stdin);
-    m.editora[strcspn(m.editora, "\n")] = 0;
-
-    printf("Ano da edicao: ");
-    fgets(buffer, sizeof(buffer), stdin);
-    sscanf(buffer, "%d", &m.anoEdicao);
-
-    printf("Qtd. volumes: ");
-    fgets(buffer, sizeof(buffer), stdin);
-    sscanf(buffer, "%d", &m.qtdVolumes);
-
-    printf("Qtd. volumes adquiridos: ");
-    fgets(buffer, sizeof(buffer), stdin);
-    sscanf(buffer, "%d", &m.qtdAdquiridos);
-
-    printf("Volumes adquiridos: ");
-    for (int i = 0; i < m.qtdAdquiridos; i++) {
-        scanf("%d", &m.volumes[i]);
-    }
-    getchar(); 
-
-    salvarRegistro(&m);
-}
 
 
 void lerRegistro() {
     char busca[20];
     printf("Buscar por ISBN: ");
-    fgets(busca, 20, stdin); strtok(busca, "\n");
+    fgets(busca, sizeof(busca), stdin);
+    busca[strcspn(busca, "\n")] = 0; // remove o \n
+
     for (int i = 0; i < totalIndices; i++) {
         if (strcmp(idxPrimarios[i].isbn, busca) == 0) {
             FILE *fp = fopen("registro.txt", "rb");
+            if (!fp) {
+                printf("Erro ao abrir o arquivo de registros.\n");
+                return;
+            }
+
             fseek(fp, idxPrimarios[i].posicao, SEEK_SET);
+
             Manga m;
             fread(&m, sizeof(Manga), 1, fp);
             fclose(fp);
-            printf("---\nTitulo: %s\nISBN: %s\nAutor(es): %s\nVolumes adquiridos: ", m.titulo, m.isbn, m.autores);
-            for (int k = 0; k < m.qtdAdquiridos; k++) printf("%d ", m.volumes[k]);
+
+            // Verifica se o registro está vazio (apagado)
+            if (m.isbn[0] == '\0') {
+                printf("Este registro foi apagado.\n");
+                return;
+            }
+
+            printf("\n---\n");
+            printf("Título: %s\n", m.titulo);
+            printf("ISBN: %s\n", m.isbn);
+            printf("Autor(es): %s\n", m.autores);
+            printf("Ano de início: %d\n", m.anoInicio);
+            if (m.anoFim == -1)
+                printf("Ano de fim: Em andamento\n");
+            else
+                printf("Ano de fim: %d\n", m.anoFim);
+            printf("Gênero: %s\n", m.genero);
+            printf("Revista: %s\n", m.revista);
+            printf("Editora: %s\n", m.editora);
+            printf("Ano da edição: %d\n", m.anoEdicao);
+            printf("Quantidade de volumes: %d\n", m.qtdVolumes);
+            printf("Volumes adquiridos (%d): ", m.qtdAdquiridos);
+            for (int k = 0; k < m.qtdAdquiridos; k++) {
+                printf("%d ", m.volumes[k]);
+            }
             printf("\n---\n");
             return;
         }
     }
-    printf("Registro nao encontrado.\n");
+    printf("Registro não encontrado.\n");
 }
+
+
 
 void apagarRegistro() {
     char isbn[20];
@@ -218,7 +192,7 @@ void processarLinha(Manga *m, const char *linhaOriginal) {
 
 void criarRegistroPorLinha() {
     char linha[512];
-    printf("Insira os dados do manga (separados por ';', volumes entre colchetes):\n");
+    printf("Insira os dados do manga (separados por ';'e com volumes entre colchetes):\n");
     fgets(linha, sizeof(linha), stdin); strtok(linha, "\n");
 
     Manga m;

@@ -14,7 +14,7 @@ typedef struct {
     char titulo[100];
     char autores[100];
     int anoInicio;
-    int anoFim; // -1 se indefinido
+    int anoFim; 
     char genero[100];
     char revista[100];
     char editora[100];
@@ -26,7 +26,7 @@ typedef struct {
 
 typedef struct {
     char isbn[20];
-    long posicao; // posição no arquivo
+    long posicao; 
 } IndicePrimario;
 
 typedef struct {

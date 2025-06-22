@@ -1,17 +1,20 @@
+// Marcel Henrique Rodrigues Batista -15474421
+// Pedro Bernardo Rodrigues Pinto - 15590042
+
 #include "manga.h"
 
 int main() {
     int op;
     do {
+        carregarIndices();
         printf("\n\t=====Menu=====\n");
         printf("================================\n");
         printf("\nEscolha uma opcao:\n");
-        printf("1. Criar registro manual\n");
-        printf("2. Criar registro por linha unica\n");
-        printf("3. Criar registro lendo arquivo .txt\n");
-        printf("4. Ler registro pelo ISBN\n");
-        printf("5. Atualizar registro\n");
-        printf("6. Apagar registro\n");
+        printf("1. Criar registro por linha unica\n");
+        printf("2. Criar registro lendo arquivo .txt\n");
+        printf("3. Ler registro pelo ISBN\n");
+        printf("4. Atualizar registro\n");
+        printf("5. Apagar registro\n");
         printf("0. Sair\n");
         printf("Escolha: ");
         scanf("%d", &op); 
@@ -21,21 +24,18 @@ int main() {
 
         switch (op) {
             case 1: 
-                criarRegistro(); 
-                break;
-            case 2: 
                 criarRegistroPorLinha(); 
                 break;
-            case 3:
+            case 2:
                 criarRegistrosDeArquivo(); 
                 break;
-            case 4: 
+            case 3: 
                 lerRegistro(); 
                 break;
-            case 5: 
+            case 4: 
                 atualizarRegistro(); 
                 break;
-            case 6: 
+            case 5: 
                 apagarRegistro(); 
                 break;
         }
